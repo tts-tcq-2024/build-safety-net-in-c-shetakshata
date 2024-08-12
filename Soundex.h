@@ -17,23 +17,48 @@ char getSoundexCode(char c)
     }
     return '0';
 }
-void generateSoundex(const char *name, char *soundex) {
-    int len = strlen(name);
+void CheckAndAddCharacter(char *soundex, int *sIndex, char code, char *prevCode) 
+{ 
+    if (code != '0' && code != *prevCode) 
+    {
+        soundex[(*sIndex)++] = code;
+        *prevCode = code;
+    }
+}
+ 
+void RemainingChars(const char *name, char *soundex, int *sIndex) 
+{
+    char prevCode = getSoundexCode(soundex[0]);
+    for (int i = 1; name[i] != '\0' && *sIndex < 4; i++) 
+    {
+        char code = getSoundexCode(name[i]);
+        CheckAndAddCharacter(soundex, sIndex, code, &prevCode);
+    }
+}
+ 
+ 
+void paddingWithZeros(char *soundex, int startIndex) 
+{
+    while (startIndex < 4) 
+    {
+        soundex[startIndex++] = '0';
+    }
+    soundex[4] = '\0';
+}
+ 
+void generateSoundex(const char *name, char *soundex)
+{
+    if (name[0] == '\0') 
+    {
+        strcpy(soundex, "0000");
+        return;
+    }
     soundex[0] = toupper(name[0]);
     int sIndex = 1;
 
-    for (int i = 1; i < len && sIndex < 4; i++) {
-        char code = getSoundexCode(name[i]);
-        if (code != '0' && code != soundex[sIndex - 1]) {
-            soundex[sIndex++] = code;
-        }
-    }
-
-    while (sIndex < 4) {
-        soundex[sIndex++] = '0';
-    }
-
-    soundex[4] = '\0';
+ 
+    RemainingChars(name, soundex, &sIndex);
+    paddingWithZeros(soundex, sIndex);    
 }
-
+ 
 #endif // SOUNDEX_H
